@@ -1,0 +1,44 @@
+openapi: "3.0.1"
+info:
+  title: "Catalog"
+  version: "0.1.0"
+paths:
+  /pets:
+    get:
+      responses:
+        200:
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pets"
+      x-amazon-apigateway-integration:
+        type: "http"
+        httpMethod: "GET"
+        uri: "https://petstore.swagger.io/v2/pet/findByStatus?status=available"
+        passthroughBehavior: "when_no_match"
+        responses:
+          200:
+            statusCode: "200"
+            responseTemplates:
+              application/json: "#set($inputRoot = $input.path('$'))\n[\n##TODO: Update\
+                \ this foreach loop to reference array from input json\n#foreach($elem\
+                \ in $inputRoot)\n {\n  \"id\" : $elem.id,\n  \"name\" : \"$elem.name\"\
+                \n} \n#if($foreach.hasNext),#end\n#end\n]"
+components:
+  schemas:
+    Pets:
+      title: "Pets model"
+      type: "array"
+      items:
+        $ref: "#/components/schemas/Pet"
+    Pet:
+      title: "Pet model"
+      type: "object"
+      properties:
+        id:
+          type: "number"
+        name:
+          type: "string"
+
+

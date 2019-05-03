@@ -1,0 +1,85 @@
+openapi: "3.0.1"
+info:
+  title: "Management"
+  version: "0.1.0"
+paths:
+  /pets:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePet"
+        required: true
+      responses:
+        200:
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pet"
+      x-amazon-apigateway-request-validator: "Validate body"
+      x-amazon-apigateway-integration:
+        type: "http"
+        httpMethod: "POST"
+        uri: "https://petstore.swagger.io/v2/pet"
+        passthroughBehavior: "when_no_match"
+        responses:
+          200:
+            statusCode: "200"
+  /pet/{id}:
+    delete:
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        404:
+          description: "404 response"
+          content: {}
+        200:
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      x-amazon-apigateway-integration:
+        type: "http"
+        httpMethod: "DELETE"
+        uri: "https://petstore.swagger.io/v2/pet/{id}"
+        passthroughBehavior: "when_no_match"
+        requestParameters:
+          integration.request.header.api_key: "'special-key'"
+          integration.request.path.id: "method.request.path.id"
+        responses:
+          200:
+            statusCode: "200"
+          404:
+            statusCode: "404"
+components:
+  schemas:
+    Empty:
+      title: "Empty Schema"
+      type: "object"
+    Pet:
+      title: "Pet"
+      type: "object"
+      properties:
+        id:
+          type: "number"
+        name:
+          type: "string"
+    CreatePet:
+      title: "Pet"
+      required:
+      - "name"
+      type: "object"
+      properties:
+        name:
+          type: "string"
+x-amazon-apigateway-request-validators:
+  Validate body:
+    validateRequestParameters: false
+    validateRequestBody: true
